@@ -18,7 +18,7 @@ class InitGifPager(
             LoadResult.Page(
                 data = data,
                 prevKey = if (page == START_PAGE) null else page - 1,
-                nextKey = if (data.isEmpty()) null else page + 1
+                nextKey = null
             )
 
         } catch (e: Exception) {
@@ -30,6 +30,5 @@ class InitGifPager(
         state.closestPageToPosition(it)?.prevKey?.plus(1)
             ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
     }
-
 
 }

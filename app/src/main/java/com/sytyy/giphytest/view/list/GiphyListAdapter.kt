@@ -2,6 +2,7 @@ package com.sytyy.giphytest.view.list
 
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.Navigation
@@ -16,7 +17,7 @@ import com.sytyy.giphytest.model.Gif
 import com.sytyy.giphytest.model.util.GifComparator
 
 
-class GiphyListAdapter(private val context: Context) :
+class GiphyListAdapter(private val context: Context,  val phrase: String = "init") :
     PagingDataAdapter<Gif, GiphyListAdapter.GifViewHolder>(GifComparator) {
 
     class GifViewHolder(val binding: ItemGifBinding) : RecyclerView.ViewHolder(binding.root)
@@ -36,9 +37,10 @@ class GiphyListAdapter(private val context: Context) :
         holder.binding.gifFrame.setOnClickListener {
             Navigation.findNavController(holder.binding.root).navigate(
                 GiphyListFragmentDirections.actionGiphyListFragmentToGiphyGifFragment(
-                    position
+                    position, phrase
                 )
             )
+            Log.d("Phrase", phrase)
         }
     }
 

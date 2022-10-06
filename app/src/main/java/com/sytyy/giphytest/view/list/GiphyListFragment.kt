@@ -12,12 +12,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.PagingData
-import androidx.recyclerview.widget.RecyclerView
 import com.sytyy.giphytest.databinding.FragmentGiphyListBinding
 import com.sytyy.giphytest.viewmodel.GiphyViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -26,6 +23,8 @@ class GiphyListFragment : Fragment() {
     private lateinit var listBinding: FragmentGiphyListBinding
 
     private val listViewModel: GiphyViewModel by activityViewModels()
+
+    private var phrase: String = "init"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,11 +36,10 @@ class GiphyListFragment : Fragment() {
             gifSearch.setOnQueryTextListener(object :
                 SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(p0: String?): Boolean {
-                    p0?.let { phrase ->
-                        lifecycleScope.launch {
-                            listViewModel.searchGifs(phrase).observe(viewLifecycleOwner) {
-                                initAdapter().submitData(lifecycle, it)
-                            }
+                    phrase = p0.toString()
+                    lifecycleScope.launch {
+                        listViewModel.searchGifs(phrase).observe(viewLifecycleOwner) {
+                            initAdapter(phrase).submitData(lifecycle, it)
                         }
                     }
                     return false
@@ -50,14 +48,27 @@ class GiphyListFragment : Fragment() {
                 override fun onQueryTextChange(p0: String?): Boolean = false
 
             })
-            lifecycleScope.launch {
-                listViewModel.getAllGifs().observe(viewLifecycleOwner) {
-                    initAdapter().submitData(lifecycle, it)
+            when (initAdapter(phrase).phrase) {
+                "init" -> {
+                    lifecycleScope.launch {
+                        listViewModel.getAllGifs().observe(viewLifecycleOwner) {
+                            initAdapter("init").submitData(lifecycle, it)
+                        }
+                    }
+                }
+                else -> {
+                    lifecycleScope.launch {
+                        listViewModel.searchGifs(phrase).observe(viewLifecycleOwner) {
+                            initAdapter(phrase).submitData(lifecycle, it)
+                        }
+                    }
                 }
             }
+
         }
         return listBinding.root
     }
+
 
     private fun handleError(loadState: CombinedLoadStates) {
         val errorState = loadState.source.append as? LoadState.Error
@@ -67,8 +78,8 @@ class GiphyListFragment : Fragment() {
         }
     }
 
-    private fun initAdapter(): GiphyListAdapter {
-        val adapter = GiphyListAdapter(requireContext())
+    private fun initAdapter(phrase: String): GiphyListAdapter {
+        val adapter = GiphyListAdapter(requireContext(), phrase)
         adapter.run {
             addLoadStateListener {
                 listBinding.apply {

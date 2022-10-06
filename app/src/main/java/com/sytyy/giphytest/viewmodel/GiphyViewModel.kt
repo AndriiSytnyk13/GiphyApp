@@ -1,5 +1,6 @@
 package com.sytyy.giphytest.viewmodel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -10,7 +11,9 @@ import javax.inject.Inject
 @HiltViewModel
 class GiphyViewModel @Inject constructor(private val repository: GifRepository) : ViewModel() {
 
+    var phrase = MutableLiveData("init")
+
     fun searchGifs(path: String) = repository.searchGifs(path).cachedIn(viewModelScope)
 
-    fun getAllGifs() = repository.getGifs()
+    fun getAllGifs() = repository.getGifs().cachedIn(viewModelScope)
 }

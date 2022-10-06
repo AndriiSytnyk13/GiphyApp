@@ -18,7 +18,7 @@ class SearchGifPager(
             LoadResult.Page(
                 data = response.data,
                 prevKey = if (page == START_PAGE) null else page - 1,
-                nextKey = if (response.data.isEmpty()) null else page + 1
+                nextKey = null
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
