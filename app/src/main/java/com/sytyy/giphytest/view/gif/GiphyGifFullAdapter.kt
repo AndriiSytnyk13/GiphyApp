@@ -1,17 +1,18 @@
 package com.sytyy.giphytest.view.gif
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sytyy.giphytest.databinding.ItemGifFullBinding
 import com.sytyy.giphytest.model.Gif
+import com.sytyy.giphytest.model.util.GifComparator
 
 
-class GiphyGifFullAdapter(private val context: Context, private val list: ArrayList<Gif>) :
-    RecyclerView.Adapter<GiphyGifFullAdapter.GifViewHolder>() {
+class GiphyGifFullAdapter(private val context: Context) :
+    PagingDataAdapter<Gif, GiphyGifFullAdapter.GifViewHolder>(GifComparator) {
 
     class GifViewHolder(val binding: ItemGifFullBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -21,18 +22,8 @@ class GiphyGifFullAdapter(private val context: Context, private val list: ArrayL
         )
 
     override fun onBindViewHolder(holder: GifViewHolder, position: Int) {
-        val gif = list[position].image.downsizedMedium.url
+        val gif = getItem(position)?.image?.downsizedMedium?.url
         Glide.with(context).load(gif).into(holder.binding.gif)
     }
-
-    override fun getItemCount(): Int = list.size
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun getGifs(gifList: ArrayList<Gif>) {
-        list.addAll(gifList)
-        notifyDataSetChanged()
-    }
-
 
 }

@@ -1,6 +1,7 @@
 package com.sytyy.giphytest.view.gif
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.sytyy.giphytest.databinding.FragmentGiphyGifBinding
 import com.sytyy.giphytest.viewmodel.GiphyViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -26,18 +28,17 @@ class GiphyGifFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         FragmentGiphyGifBinding.inflate(inflater, container, false).run {
-            val adapter = GiphyGifFullAdapter(requireContext(), ArrayList())
+            val adapter = GiphyGifFullAdapter(requireContext())
             viewPager.adapter = adapter
             lifecycleScope.launch {
                 delay(200)
                 viewPager.setCurrentItem(args.position, false)
                 viewPager.visibility = View.VISIBLE
             }
-            viewModel.gifs.observe(viewLifecycleOwner) {
-                adapter.getGifs(it)
-            }
-            viewModel._position.observe(viewLifecycleOwner) {
-                viewPager.setCurrentItem(it, false)
+            lifecycleScope.launch {
+                viewModel.getAllGifs().observe(viewLifecycleOwner) { data ->
+                    adapter.submitData(lifecycle, data)
+                }
             }
             return root
         }

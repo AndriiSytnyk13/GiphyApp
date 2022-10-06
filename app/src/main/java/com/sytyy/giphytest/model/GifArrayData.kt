@@ -5,4 +5,7 @@ import javax.inject.Inject
 
 data class GifArrayData @Inject constructor(
     @SerializedName("data")
-    val data: ArrayList<Gif>)
+    val data: ArrayList<Gif>,
+    @SerializedName("pagination")
+    val pagination: Pagination
+)
